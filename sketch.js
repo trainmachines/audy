@@ -1,5 +1,5 @@
 
-// Video and PoseNet
+// Video, PoseNet, and Sound
 
 
 //Declare variables
@@ -8,7 +8,7 @@ let poseNet;
 let poses = [];
 
 // Neural Network
-let brain;
+let neuralNetwork;
 
 // Interface
 let add_dataButton;
@@ -17,12 +17,12 @@ let save_modelButton;
 let dataLabel;
 let trainButton;
 let classificationP;
-let save_dataModel;
-let save_Model
+//let save_dataModel;
+//let save_Model
 
 //Adding to find a solution
 let model;
-let targetLabel = 'C';
+let targetLabel = 'A';
 // let trainingData = [];
 
 let state = 'collection';
@@ -39,21 +39,25 @@ let notes = {
 
 let env, wave;
 let skeleton;
+let frequency;
 
 
 
 //add to enables saving data by pressing s and save model by pressing m (this was working but now it is not)
 function keyPressed() {
- if (key == 's') {
+
+  if (key == 's') {
     model.saveData('audy');
   } else if (key == 'm') {
     model.save();
+  } else {
+    targetLabel = key.toUpperCase();
   }
 }
 
 //setup
 function setup() {
-  createCanvas(320, 240);
+  createCanvas(530, 370);
   video = createCapture(VIDEO);
   video.size(width, height);
 
@@ -72,10 +76,13 @@ function setup() {
 
   // The interface
   dataLabel = createSelect();
+  dataLabel.option('A');
+  dataLabel.option('B');
   dataLabel.option('C');
   dataLabel.option('D');
   dataLabel.option('E');
   dataLabel.option('F');
+  dataLabel.option('G');
 
   add_dataButton = createButton('add data');
   add_dataButton.mousePressed(addExample);
@@ -92,20 +99,57 @@ function setup() {
   // Create the model
   const options = {
     inputs: 34,
-    outputs: 4,
+    outputs: 7,
     task: 'classification',
     debug: true
   }
-  brain = ml5.neuralNetwork(options);
+  neuralNetwork = ml5.neuralNetwork(options);
+  //model.loadData('model.json');
+  //model.load('        ');
+
+  //        Load model pointing to each file
+/*  const modelDetails = {
+    model: 'model/model.json',
+    metadata: 'model/model_meta.json',
+    weights: 'model/model.weights.bin'
+  }
+  neuralNetwork.load(modelDetails, modelReady);*/
 }
+
+//create a frequency class that could play variations
+/*class Frequency {
+  constructor() {
+    this.x = 500;
+    this.y = 175;
+  }
+
+  volume() {
+    play(img3,
+        this.x,
+        this.y,
+        100,
+        100);
+  }
+}*/
+
 
 // Train the model while normalizing
 function trainModel() {
-  brain.normalizeData();
+  neuralNetwork.normalizeData();
   const options = {
     epochs: 30
   }
-  brain.train(options, finishedTraining);
+  neuralNetwork.train(options, finishedTraining);
+}
+
+// save data model
+function save_dataModel() {
+
+}
+
+// save the model
+function save_Model() {
+
 }
 
 //added to see epochs while training if possible
@@ -122,7 +166,7 @@ function finishedTraining() {
 function classify() {
   if (poses.length > 0) {
     const inputs = getInputs();
-    brain.classify(inputs, gotResults);
+    neuralNetwork.classify(inputs, gotResults);
   }
 }
 
@@ -154,7 +198,7 @@ function addExample() {
   if (poses.length > 0) {
     const inputs = getInputs();
     const target = dataLabel.value();
-    brain.addData(inputs, [target]);
+    neuralNetwork.addData(inputs, [target]);
   }
 }
 
@@ -167,7 +211,7 @@ function modelReady() {
 function draw() {
   image(video, 0, 0, width, height);
   strokeWeight(2);
-  // For one pose only (could use a for loop with multiple poses)
+  // For one pose only (could use a for loop with multiple poses)s
   if (poses.length > 0) {
     const pose = poses[0].pose;
     for (let i = 0; i < pose.keypoints.length; i += 1) {
