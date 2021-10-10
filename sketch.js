@@ -41,20 +41,6 @@ let env, wave;
 let skeleton;
 let frequency;
 
-
-
-//add to enables saving data by pressing s and save model by pressing m (this was working but now it is not)
-function keyPressed() {
-
-  if (key == 's') {
-    model.saveData('audy');
-  } else if (key == 'm') {
-    model.save();
-  } else {
-    targetLabel = key.toUpperCase();
-  }
-}
-
 //setup
 function setup() {
   createCanvas(530, 370);
@@ -205,6 +191,18 @@ function addExample() {
 // PoseNet ready
 function modelReady() {
   console.log('model loaded');
+}
+
+//add to enables saving data by pressing s and save model by pressing m (this was working but now it is not)
+function keyPressed() {
+  console.log("key pressed called.");
+  if (keyCode === 's') {
+    model.saveData('audy');
+  } else if (keyCode === 'm') {
+    model.save();
+  } else {
+    //targetLabel = dataLabel.?.toUpperCase(); // Check this...not really sure where you're trying to get your label from.
+  }
 }
 
 // Draw PoseNet
